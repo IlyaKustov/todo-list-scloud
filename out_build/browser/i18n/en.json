@@ -1,0 +1,13 @@
+{
+  "change_Open"    : "Open",
+  "change_Close"   : "Close",
+  "change_Work"    : "In work",
+  "change_Put_off" : "Put off",
+  "change_Reopen"  : "Reopen",
+  "Открыт"         : "Open",
+  "В работе"       : "In progress",
+  "Закрыт"         : "Closed",
+  "board_Открыт"   : "Open",
+  "board_В работе" : "In progress",
+  "board_Закрыт"   : "Closed"
+}
