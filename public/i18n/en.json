@@ -9,5 +9,6 @@
   "Закрыт"         : "Closed",
   "board_Открыт"   : "Open",
   "board_В работе" : "In progress",
-  "board_Закрыт"   : "Closed"
+  "board_Закрыт"   : "Closed",
+  "todo_text_here": "Todo text..."
 }

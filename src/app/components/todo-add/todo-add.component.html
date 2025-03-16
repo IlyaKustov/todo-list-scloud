@@ -15,9 +15,11 @@
          (mouseenter)="onEvent($event)"
          (mouseleave)="onEvent($event)">
       <input type="text" class="form-control rounded-3" aria-describedby="basic-addon2"
-       (focusin)="onEvent($event)"
-       (focusout)="onEvent($event)"
-       [(ngModel)]="toDoText">
+             [placeholder]="'todo_text_here'|translate"
+             (keydown)="keyDown($event)"
+             (focusin)="onEvent($event)"
+             (focusout)="onEvent($event)"
+             [(ngModel)]="toDoText">
       <i class="close-icon" [ngClass]="{'show-close-icon': canShowClear()}" (click)="toDoText=''"></i>
     </div>
   </div>

@@ -32,10 +32,16 @@ export class TodoAddComponent {
   }
 
   protected addNewToDoItem(){
-    if(this.toDoText!== '' && this.toDoText!== undefined){
-      let newItem:IToDo = {text:this.toDoText, status_id:this.store.statuses()[0].id, status_text:this.store.statuses()[0].status};
+    if(this.toDoText!== '' && this.toDoText!== undefined && this.toDoText.trim()!== ''){
+      let newItem:IToDo = {text:this.toDoText.trim(), status_id:this.store.statuses()[0].id, status_text:this.store.statuses()[0].status};
       this.store.addToDoItem(newItem);
       this.toDoText = '';
     }
   }
+
+  protected keyDown(event:any){
+    if (event.key == 'Enter')
+      this.addNewToDoItem();
+  }
+
 }

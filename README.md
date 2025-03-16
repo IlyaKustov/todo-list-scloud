@@ -18,6 +18,11 @@
 ng start
 ```
 
+## Живое демо
+Доступно по адресу https://todo-list-scloud.vercel.app/home <br>
+
+Проект развернут на площадке [Vercel](https://vercel.com/)
+
 ## Тестирование
 Реализованы следующие тесты
 * На реализованный `signalStore` **ToDoStore** 
