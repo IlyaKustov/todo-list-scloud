@@ -1,0 +1,19 @@
+@use 'styles' as *;
+
+.icon-right-margin{
+  margin-right: 0.3rem;
+}
+
+.icon-size{
+  font-size: larger;
+}
+
+.todo-card{
+  @extend .panel;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.2rem;
+  justify-content: center;
+  font-size: 0.9rem;
+  border-radius: var(--bs-border-radius-lg);
+}

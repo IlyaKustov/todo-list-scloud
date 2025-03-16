@@ -1,0 +1,19 @@
+<div class="d-flex flex-column">
+  <h4 class="">{{'Current tasks' | translate}}</h4>
+  <div class="row-container">
+    <div class="todo-card" >
+        <i class="bi bi-info-circle text-primary icon-right-margin icon-size"></i>
+        <span id="open_count" class="fw-semibold">{{'Open' | translate}} - {{store.openCount()}}</span>
+    </div>
+
+    <div class="todo-card">
+        <i class="bi bi-info-circle text-danger icon-right-margin icon-size"></i>
+        <span id="work_count" class="fw-semibold">{{'In progress' | translate}} - {{store.workCount()}}</span>
+    </div>
+
+    <div class="todo-card" >
+        <i class="bi bi-info-circle text-success icon-right-margin icon-size"></i>
+        <span id="close_count" class="fw-semibold">{{'Closed' | translate}} - {{store.closedCount()}}</span>
+    </div>
+  </div>
+</div>

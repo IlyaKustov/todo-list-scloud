@@ -1,0 +1,25 @@
+<div class="flex-column">
+  <h4 class="desktop-caption">{{'Add task' | translate}}</h4>
+  <div class="row-container">
+    <button type="button"
+            id="AddNewTask"
+            aria-label="Add new task"
+            class="add-button rounded-3 fw-semibold"
+            [disabled]="!toDoText"
+            (click)="addNewToDoItem()">
+      <i class="bi bi-plus-lg desktop-caption"></i>
+      <span class="mobile-caption">{{'Add task' | translate}}</span>
+    </button>
+
+    <div class="input-group flex-fill rounded-3 align-items-center"
+         (mouseenter)="onEvent($event)"
+         (mouseleave)="onEvent($event)">
+      <input type="text" class="form-control rounded-3" aria-describedby="basic-addon2"
+       (focusin)="onEvent($event)"
+       (focusout)="onEvent($event)"
+       [(ngModel)]="toDoText">
+      <i class="close-icon" [ngClass]="{'show-close-icon': canShowClear()}" (click)="toDoText=''"></i>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,91 @@
+<div class="d-flex flex-column">
+  <div class="todo-header" >
+    <h4>{{'Tasks' | translate}}</h4>
+    <h4 class="float-end hide-on-phone me-3">{{'Status' | translate}}</h4>
+  </div>
+
+  <ng-template #itemTemplate let-item='item'>
+    <div class="todo-item">
+      <span class="todo-text">{{item.text}}</span>
+      <button type="button" class="todo-button rounded-3" (click)="openModal(todoEditTemplate, item)">
+        {{item.status_text | translate}}
+      </button>
+    </div>
+    <hr class="my-2 hide-on-phone">
+  </ng-template>
+
+  <div class="items-container">
+    @if(fullMode()){
+      @for(toDoItem of store.sortedToDoItems();track toDoItem.id){
+        <ng-container *ngTemplateOutlet="itemTemplate;context:{item:toDoItem}"></ng-container>
+      }
+    } @else{
+      @for(toDoItem of firstFiveItems();track toDoItem.id){
+        <ng-container *ngTemplateOutlet="itemTemplate;context:{item:toDoItem}"></ng-container>
+      }
+    }
+  </div>
+  <div #scrollTo class="scroll-element" ></div>
+</div>
+
+@if(store.sortedToDoItems().length>5){
+  <div class="d-flex justify-content-center">
+    <button type="button" class="todo-show-button rounded-3 fw-semibold" (click)="invertShowItemsList()">
+      {{buttonText() | translate}}
+    </button>
+  </div>
+}
+
+
+<ng-template #todoEditTemplate>
+  <div class="todo-modal-header">
+    <h4 class="mb-0">{{'Task change' | translate}}</h4>
+    <button type="button" class="btn-close close"  aria-label="Close" (click)="cancelEdit()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body d-flex flex-column" >
+    <div class="input-group flex-fill rounded-3 align-items-center">
+      <input type="text" class="form-control rounded-3" aria-describedby="basic-addon2" [(ngModel)]="toDoItemCopy.text"  autofocus/>
+      <i class="close-icon" (click)="toDoItemCopy.text=''"></i>
+    </div>
+
+    <div *ngIf="toDoItemCopy.status_id === 1" class="buttons-panel">
+      <button type="button" class="todo-button-modal  rounded-3"
+              [disabled]="!toDoItemCopy.text" (click)="setStatus(1)">
+        {{'change_Work' | translate}}
+      </button>
+      <button type="button" class="todo-button-modal  rounded-3"
+              [disabled]="!toDoItemCopy.text"
+              (click)="setStatus(2)">{{'change_Close' | translate}}
+      </button>
+    </div>
+
+    <div *ngIf="toDoItemCopy.status_id === 2" class="buttons-panel">
+      <button type="button" class="todo-button-modal  rounded-3"
+              [disabled]="!toDoItemCopy.text"
+              (click)="setStatus(0)">{{'change_Put_off' | translate}}
+      </button>
+      <button type="button" class="todo-button-modal  rounded-3"
+              [disabled]="!toDoItemCopy.text"
+              (click)="setStatus(2)">{{'change_Close' | translate}}
+      </button>
+    </div>
+
+    <div *ngIf="toDoItemCopy.status_id === 3" class="buttons-panel">
+      <button type="button" class="todo-button-modal rounded-3"
+              [disabled]="!toDoItemCopy.text"
+              (click)="setStatus(0)">{{'change_Reopen' | translate}}
+      </button>
+    </div>
+  </div>
+  <div class="todo-modal-footer">
+    <button type="button" class="footer-button btn-success rounded-3"
+            [disabled]="!toDoItemCopy.text"
+            (click)="updateToDo()">
+      {{'Change' | translate}}
+    </button>
+    <button type="button" class="footer-button btn-successlite fw-semibold rounded-3" (click)="deleteToDo()">{{'Delete task' | translate}}</button>
+  </div>
+</ng-template>
+

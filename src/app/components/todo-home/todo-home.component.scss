@@ -1,0 +1,44 @@
+@use 'styles' as *;
+
+.root-container{
+  display: flex;
+  flex-direction: column;
+  gap: $space30;
+  padding: 50px;
+  margin: auto;
+  max-width: 1300px;
+  min-width: 320px;
+
+  @include phone {
+    padding: 20px 13px;
+    gap: $space20;
+  }
+}
+
+.current-add-container{
+  display: flex;
+  flex-direction: row;
+  gap: $space30 $space20;
+
+  @include tablet {
+    flex-direction: column;
+  }
+
+  @include phone {
+    gap: $space20;
+  }
+}
+
+.board-panel{
+  @extend .panel;
+
+  @include tablet {
+    display: none;
+  }
+}
+
+::ng-deep {
+  body {
+    background-color: var(--bs-secondary-bg) !important;
+  }
+}

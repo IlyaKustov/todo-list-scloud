@@ -1,0 +1,30 @@
+@use "mixins.scss" as *;
+
+$space20: 20px;
+$space30: 30px;
+
+.gap-20{
+  gap: $space20;
+}
+
+.gap-30{
+  gap: $space30;
+}
+
+h4{
+  margin-bottom: $space20!important;
+}
+
+.row-container {
+  display: flex;
+  flex-direction: row;
+  gap: $space20;
+
+  @include phone {
+    flex-direction: column;
+  }
+}
+
+.no-grow{
+  flex-grow: 0 !important;
+}

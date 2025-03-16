@@ -1,0 +1,148 @@
+@use 'styles' as *;
+
+.items-container{
+  display: flex;
+  flex-direction: column;
+
+  @include phone {
+    gap: $space20;
+  }
+}
+
+.todo-text{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include phone {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.todo-header{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.todo-item{
+  @extend .panel;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  @include phone {
+    flex-direction: column;
+  }
+
+  @include not-phone{
+    padding: 0;
+    background: none;
+    border: none;
+  }
+}
+
+.todo-button{
+  @extend .btn;
+  @extend .btn-success;
+  @extend .btn-sm;
+  font-weight: 600;
+  float: right;
+  min-width: 95px;
+
+  @include not-phone{
+    width: 95px;
+    font-weight: normal;
+    @include button-variant($light, $light);
+  }
+}
+
+.todo-button-modal{
+  @extend .btn;
+  @extend .btn-success;
+  @extend .btn-sm;
+
+  width: 130px;
+  min-width: 130px;
+  font-weight: normal;
+  float: right;
+  @include button-variant($light, $light);
+}
+
+.todo-show-button{
+  @extend .btn;
+  @extend .btn-successlite;
+  margin-top: 40px;
+  width: 150px;
+  min-width: 150px;
+
+  @include tablet {
+    margin-top: 32px;
+  }
+
+  @include phone {
+    margin-top: 24px;
+  }
+}
+
+.buttons-panel{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: $space20;
+}
+
+.todo-modal-header{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 16px 10px 16px;
+}
+
+.todo-modal-footer{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 30px 16px 50px 16px;
+}
+
+.close-icon{
+  @extend .bi;
+  @extend .bi-x-lg;
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  z-index: 100;
+  color: $danger;
+  display: block;
+}
+
+
+.footer-button{
+  @extend .btn;
+  min-width: 200px;
+  max-width: 200px;
+  @include phone {
+    min-width: 150px;
+  }
+}
+
+.hide-on-phone{
+  @include phone {
+    display: none;
+  }
+}
+
+hr {
+  border-top-color: $secondary;
+}
+
+hr:last-child {
+  display: none;
+}
+
+.scroll-element{
+  position: absolute;
+  top: -3px;
+}

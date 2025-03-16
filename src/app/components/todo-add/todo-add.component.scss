@@ -1,0 +1,45 @@
+@use 'styles' as *;
+
+.close-icon{
+  @extend .bi;
+  @extend .bi-x-lg;
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  z-index: 100;
+  color: $danger;
+  display: none;
+
+  @include phone {
+    display: block;
+  }
+}
+
+.show-close-icon{
+  display: block;
+}
+
+.add-button{
+  @extend .btn;
+  @extend .btn-success;
+
+  @include phone {
+    order: 5;
+  }
+}
+
+.mobile-caption{
+  display: none;
+
+  @include phone {
+    display: block;
+  }
+}
+
+.desktop-caption{
+  display: block;
+
+  @include phone {
+    display: none;
+  }
+}

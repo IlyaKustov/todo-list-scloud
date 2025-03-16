@@ -1,0 +1,21 @@
+  <h3 class="mb-5 text-center">{{'Task board' | translate}}</h3>
+  <div class="main-container" >
+    @for(statusItem of store.statuses();track statusItem.id){
+      <div class="todo-container">
+        <div class="todo-card">
+          {{ 'board_' + statusItem.status | translate}}
+        </div>
+        <div class="panel todo-container bg-body-secondary" dndDropzone (dndDrop)="onDrop($event, statusItem.id)">
+          @for (toDoOpen of store.toDoItems();track toDoOpen.id){
+            @if (toDoOpen.status_id === statusItem.id){
+              <div class="panel no-grow" [dndDraggable]="toDoOpen" [dndDisableIf]="false">
+                <div class="todo-text">
+                  {{toDoOpen.text}}
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+</div>

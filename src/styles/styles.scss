@@ -1,0 +1,61 @@
+@forward "mixins.scss";
+@forward "common.scss";
+
+@forward  "../../node_modules/bootstrap-icons/font/bootstrap-icons.css";
+
+@import "../../node_modules/bootstrap/scss/functions";
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/variables-dark";
+
+$success: #5ABD37;
+$light: $gray-200;
+$danger: #FF6600;
+$successlite: rgba(90, 189, 55, 0.3);
+
+$theme-colors: (
+        "primary":    $primary,
+        "secondary":  $secondary,
+        "successlite":$successlite,
+        "success":    $success,
+        "info":       $info,
+        "warning":    $warning,
+        "danger":     $danger,
+        "light":      $light,
+        "dark":       $dark
+);
+
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+:root, {
+  --btn-text-color: white;
+  --btn-outline-text-color: #4B9E2E;
+}
+
+.btn-success,
+.btn-danger{
+  --bs-btn-color: var(--btn-text-color);
+  --bs-btn-hover-color: var(--btn-text-color);
+  --bs-btn-active-color: var(--btn-text-color);
+  --bs-btn-disabled-color: var(--btn-text-color);
+}
+
+.btn-successlite{
+  --bs-btn-color: var(--btn-outline-text-color);
+  --bs-btn-hover-color: var(--btn-outline-text-color);
+  --bs-btn-active-color: var(--btn-outline-text-color);
+  --bs-btn-disabled-color: var(--btn-outline-text-color);
+}
+
+.panel{
+  @extend .card;
+  @extend .card-body;
+  border-radius: var(--bs-border-radius-xl);
+  padding: 1.3rem;
+}
+
+.block-fill{
+  flex-shrink: 1;
+  display: flex;
+  flex-basis: 0;
+  flex-grow: 1;
+}
