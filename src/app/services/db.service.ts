@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
-import {NgxIndexedDBService, WithID} from 'ngx-indexed-db';
+import {NgxIndexedDBService} from 'ngx-indexed-db';
 import {IStatus} from './model/IStatus';
-import {map, Observable, switchMap, take} from 'rxjs';
+import {catchError, firstValueFrom, map, Observable, of, switchMap, take} from 'rxjs';
 import {IToDo} from './model/IToDo';
 import {statuses_table_name, todo_table_name} from './model/dbConfig';
 
@@ -24,7 +24,12 @@ export class DbService {
    *  @returns {Observable<IStatus[]>}  all statuses from DB
    */
   public GetAllStatuses(): Observable<IStatus[]> {
-    return this.dbService.getAll<IStatus>(statuses_table_name);
+    return this.dbService.getAll<IStatus>(statuses_table_name).pipe(take(1),
+      catchError((err) => {
+        console.error('[GetAllStatuses] Error', err);
+        return of(this.initValues)
+      }),
+    )
   }
 
   /**
@@ -53,18 +58,28 @@ export class DbService {
   /**
    * Add new todo item
    * @param {IToDo} toDo - new todo item
-   * @returns {Observable<IToDo & WithID>} filled item with id from db
+   * @returns {Observable<IToDo>} filled item with id from db
    */
-  public AddToDoItem(toDo: IToDo): Observable<IToDo & WithID> {
-    return this.dbService.add<IToDo>(todo_table_name, toDo);
+  public AddToDoItem(toDo: IToDo): Observable<IToDo | undefined> {
+    return this.dbService.add<IToDo>(todo_table_name, toDo).pipe(take(1),
+      catchError((err) => {
+        console.error('[AddToDoItem] Error', err);
+        return of(undefined)
+      }),
+    );
   }
 
   /**
    * Update existing todo item
    * @param {IToDo} toDo - existing todo item
    */
-  public UpdateToDoItem(toDo: IToDo): Observable<IToDo> {
-    return this.dbService.update<IToDo>(todo_table_name, toDo);
+  public UpdateToDoItem(toDo: IToDo): Observable<IToDo | undefined> {
+    return this.dbService.update<IToDo>(todo_table_name, toDo).pipe(take(1),
+      catchError((err) => {
+        console.error('[UpdateToDoItem] Error', err);
+        return of(undefined)
+      }),
+    )
   }
 
   /**
@@ -80,46 +95,27 @@ export class DbService {
 
   /**
    * Init DB for first run. Fills statuses table, if it's empty
-   * @returns {Observable<boolean>} return true, if it's all ok, or error if not
+   * @returns {Promise<boolean>} return true, if it's all ok, or false if not
    */
-  public Init(): Observable<boolean> {
-    return new Observable<boolean>(observer => {
-      let getAllSubs = this.GetAllStatuses()
-        .pipe(take(1))
-        .subscribe({
-          next: (data: IStatus[]) => {
-            getAllSubs.unsubscribe();
-
-            if (data.length !== 3) {
-              console.log('[DbService] -> Init() statuses empty, start add to db');
-              let bulkSubs = this.dbService.bulkAdd<IStatus>(statuses_table_name, this.initValues)
-                .pipe(take(1))
-                .subscribe({
-                  next: (bulkRes: number[]) => {
-                    bulkSubs.unsubscribe();
-                    console.log('[DbService] -> Init() statuses added to db', bulkRes);
-                    observer.next(true);
-                    observer.complete();
-                  },
-                  error: (bulkErr) => {
-                    bulkSubs.unsubscribe();
-                    console.error('[DbService] -> Init() Error while adding statuses', bulkErr);
-                    observer.error(bulkErr);
-                    observer.complete();
-                  }
-                })
-            }else {
-              observer.next(true);
-              observer.complete();
-            }
-          },
-          error: (err) => {
-            getAllSubs.unsubscribe();
-            console.log('Error statuses', err);
-            observer.error(err);
-            observer.complete();
-          }
-        })
-    })
+  public async Init():Promise<boolean> {
+    return firstValueFrom(this.dbService.getAll<IStatus>(statuses_table_name).pipe(take(1),
+      catchError((err) => {
+        console.error('[Init] get statuses Error', err);
+        return of([])
+      }),
+      switchMap((statuses: IStatus[]) => {
+        if (statuses.length === 3) return of(true);
+        return this.dbService.bulkAdd<IStatus>(statuses_table_name, this.initValues).pipe(take(1),
+          catchError((err) => {
+            console.error('[Init] add statuses Error', err);
+            return of([])
+          }),
+          switchMap((addRes: number[]) => {
+            return addRes.length === 0 ? of(false) : of(true);
+          })
+        )
+      })
+    ));
   }
+
 }

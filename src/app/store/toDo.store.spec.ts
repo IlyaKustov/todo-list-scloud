@@ -15,15 +15,21 @@ describe('toDoStore', () => {
   const toDo_3: IToDo = {id:3, text: 'To do text 3', status_id: status_3.id, status_text: status_3.status}
 
   const mockDbService = {
-    GetAllStatuses: ():Observable<IStatus[]> => of([status_1, status_2, status_3]),
-    GetAllToDoItems: ():Observable<IToDo[]> => of([toDo_1, toDo_2, toDo_3]),
-    UpdateToDoItem: (item:IToDo):Observable<IToDo> => of(item),
-    AddToDoItem: (item:IToDo):Observable<IToDo> => of(item),
-    Init:(): Observable<boolean> => new Observable(observer=>observer.next(true)),
-    DeleteToDoItem:(id: number | undefined)=> {
-      if(id == undefined) return new Observable<void>(observer=>observer.error('id undefined'));
+    GetAllStatuses: (): Observable<IStatus[]> => {
+      console.log('mock GetAllStatuses');
+      return of([status_1, status_2, status_3])
+    },
+    GetAllToDoItems: (): Observable<IToDo[]> => of([toDo_1, toDo_2, toDo_3]),
+    UpdateToDoItem: (item: IToDo): Observable<IToDo> => of(item),
+    AddToDoItem: (item: IToDo): Observable<IToDo> => of(item),
+    Init: async (): Promise<boolean> => {
+      console.log('mock INIT');
+      return Promise.resolve(true);
+    },
+    DeleteToDoItem: (id: number | undefined) => {
+      if (id == undefined) return new Observable<void>(observer => observer.error('id undefined'));
       else return of(undefined)
-    }
+    },
   };
 
   beforeEach(async () => {
@@ -40,18 +46,20 @@ describe('toDoStore', () => {
     expect(store).not.toBeUndefined();
   });
 
-  it('should have initial values', () => {
+  it('should have initial values', fakeAsync(() => {
     const store = TestBed.inject(ToDoStore);
     expect(store).toBeTruthy();
+    tick();
     expect(store.statuses()).toBeTruthy();
     expect(store.statuses().length).toBe(3);
     expect(store.toDoItems()).toBeTruthy();
     expect(store.toDoItems().length).toBe(3);
-  });
+  }));
 
   it('should add new todo item', fakeAsync(() => {
     const store = TestBed.inject(ToDoStore);
     expect(store).toBeTruthy();
+    tick();
     let newItem:IToDo = {text:'new item text', status_id:status_1.id, status_text:status_1.status, id:555};
     store.addToDoItem(newItem);
     tick();
@@ -70,7 +78,7 @@ describe('toDoStore', () => {
   it('should update todo item', fakeAsync(() => {
     const store = TestBed.inject(ToDoStore);
     expect(store).toBeTruthy();
-
+    tick();
     expect(store.toDoItems().length).toBe(3);
     let item = store.toDoItems()[0];
     item.text = 'changed text';
@@ -93,7 +101,7 @@ describe('toDoStore', () => {
   it('should delete todo item', fakeAsync(() => {
     const store = TestBed.inject(ToDoStore);
     expect(store).toBeTruthy();
-
+    tick();
     expect(store.toDoItems().length).toBe(3);
     let item = store.toDoItems()[0];
 

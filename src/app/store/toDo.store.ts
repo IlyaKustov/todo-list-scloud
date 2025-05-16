@@ -1,11 +1,10 @@
 import {IStatus} from '../services/model/IStatus';
 import {IToDo} from '../services/model/IToDo';
 import {patchState, signalStore, withComputed, withHooks, withMethods, withState} from '@ngrx/signals';
-import {computed, DestroyRef, inject} from '@angular/core';
+import {computed, inject} from '@angular/core';
 import {DbService} from '../services/db.service';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {rxMethod} from '@ngrx/signals/rxjs-interop';
-import {pipe, switchMap, tap} from 'rxjs';
+import {pipe, switchMap, take, tap} from 'rxjs';
 import {tapResponse} from "@ngrx/operators";
 
 type StoreState = {
@@ -25,37 +24,35 @@ export const ToDoStore = signalStore(
   withState(initialState),
 
   withComputed(({statuses, toDoItems})=>({
-    openCount: computed(() => toDoItems().filter(item=>item.status_id === statuses()[0].id).length),
-    workCount: computed(() => toDoItems().filter(item=>item.status_id === statuses()[1].id).length),
-    closedCount: computed(() => toDoItems().filter(item=>item.status_id === statuses()[2].id).length),
-    sortedToDoItems: computed(()=>toDoItems().sort((a,b)=> {
-      if (a.status_id !== undefined && b.status_id !== undefined) {
-        if (a.status_id < b.status_id) return -1;
-        else if (a.status_id > b.status_id) return 1;
-        return 0
-      }
-      return 0;
+    openCount:        computed(() => toDoItems().filter(item => item.status_id === statuses()[0].id).length),
+    workCount:        computed(() => toDoItems().filter(item => item.status_id === statuses()[1].id).length),
+    closedCount:      computed(() => toDoItems().filter(item => item.status_id === statuses()[2].id).length),
+    sortedToDoItems:  computed(() => toDoItems().sort((a,b) => {
+      return a.status_id !== undefined && b.status_id !== undefined ? a.status_id < b.status_id ? -1 : a.status_id > b.status_id ? 1 : 0 : 0;
     }))
   })),
 
-  withHooks((store, service = inject(DbService), destroyRef = inject(DestroyRef)) => {
+  withHooks((store, service = inject(DbService)) => {
     return {
       onInit() {
-        service.Init().pipe(takeUntilDestroyed(destroyRef)).subscribe({
-          next: () => {
-            service.GetAllStatuses().pipe(takeUntilDestroyed(destroyRef)).subscribe(
-              (statusesItems: IStatus[]) => patchState(store, {statuses: statusesItems})
-            );
+        service.Init()
+          .then(result => {
+            if(result){
+              service.GetAllStatuses().pipe(take(1)).subscribe(
+                (statusesItems: IStatus[]) => patchState(store, {statuses: statusesItems})
+              );
 
-            service.GetAllToDoItems().pipe(takeUntilDestroyed(destroyRef)).subscribe(
-              (items: IToDo[]) => patchState(store, {toDoItems: items})
-            );
-          },
-          error: (error) => {
-            console.error('[ToDoStore] -> Init() Error', error);
-            //TODO: Show error on interface
-          }
-        })
+              service.GetAllToDoItems().pipe(take(1)).subscribe(
+                (items: IToDo[]) => patchState(store, {toDoItems: items})
+              );
+
+            }else{
+              //TODO:вывести сообщение о невозможности дальнейшей работы
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          })
       }
     }
   }),
@@ -67,12 +64,13 @@ export const ToDoStore = signalStore(
         switchMap((item: IToDo) => {
           if (!item.status_text) {
             let status = store.statuses().find(status => status.id == item.status_id)?.status;
-            if(status) item.status_text = status;
+            if (status) item.status_text = status;
           }
           return service.AddToDoItem(item).pipe(
             tapResponse({
-              next: (value: IToDo) => {
-                patchState(store, (state: StoreState) => ({isLoading: false, toDoItems: [...state.toDoItems, value]}))
+              next: (value: IToDo | undefined) => {
+                if (value)
+                  patchState(store, (state: StoreState) => ({isLoading: false, toDoItems: [...state.toDoItems, value]}))
               },
               error: (err) => {
                 patchState(store, {isLoading: false});
@@ -92,14 +90,14 @@ export const ToDoStore = signalStore(
           return service.DeleteToDoItem(item.id).pipe(
             tapResponse({
               next: () => {
-                let existItem = store.toDoItems().find(_item=>_item.id === item.id);
-                if(existItem!==undefined){
+                let existItem = store.toDoItems().find(_item => _item.id === item.id);
+                if (existItem !== undefined) {
                   let index = store.toDoItems().indexOf(existItem);
                   let items = store.toDoItems();
                   items.splice(index, 1);
 
                   patchState(store, {isLoading: false, toDoItems: [...items]})
-                }else{
+                } else {
                   console.warn(`[ToDoStore] -> deleteToDoItem() toDo item not found for id:${item.id}`);
                 }
               },
@@ -120,17 +118,19 @@ export const ToDoStore = signalStore(
         switchMap((item: IToDo) => {
           return service.UpdateToDoItem(item).pipe(
             tapResponse({
-              next: () => {
-                let existItem = store.toDoItems().find(_item=>_item.id === item.id);
-                if(existItem!==undefined){
-                  let index = store.toDoItems().indexOf(existItem);
-                  let items = store.toDoItems();
-                  items[index] = item;
-                  patchState(store, {isLoading: false, toDoItems: [...items]})
+              next: (updRes: IToDo | undefined) => {
+                if (updRes) {
+                  let existItem = store.toDoItems().find(_item => _item.id === item.id);
+                  if (existItem !== undefined) {
+                    let index = store.toDoItems().indexOf(existItem);
+                    let items = store.toDoItems();
+                    items[index] = item;
+                    patchState(store, {isLoading: false, toDoItems: [...items]})
+                  }
                 }
 
               },
-              error: (err:Error) => {
+              error: (err: Error) => {
                 patchState(store, {isLoading: false});
                 console.error('[ToDoStore] -> updateToDoItem() ERROR', err);
               },

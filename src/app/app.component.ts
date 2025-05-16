@@ -1,4 +1,7 @@
-import {Component, inject} from '@angular/core';
+import {
+  Component,
+  inject
+} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 
@@ -21,5 +24,6 @@ export class AppComponent {
     if(!locale) locale ="ru";
     this.translate.setDefaultLang(locale);
     this.translate.use(locale);
+
   }
 }
